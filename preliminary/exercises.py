@@ -29,71 +29,72 @@ def calc_dist_mod(z, omega_m, h):
 
     return 25 - 5*np.log10(h) + 5*np.log10(ldist)
 
+if __name__ is "__main__":
+    
+    """ Exercise 1 """
 
-""" Exercise 1 """
+    z = np.arange(0.01, 2, 0.01)
+    omega_m_list = (0.2, 0.3, 0.4, 0.5)
 
-z = np.arange(0.01, 2, 0.01)
-omega_m_list = (0.2, 0.3, 0.4, 0.5)
+    plt.figure()
+    for omega_m in omega_m_list:
+        dist_mod = calc_dist_mod(z, omega_m, 0.7)
+        plt.plot(z, dist_mod, label="$" + str(omega_m) + "$")
 
-plt.figure()
-for omega_m in omega_m_list:
-    dist_mod = calc_dist_mod(z, omega_m, 0.7)
-    plt.plot(z, dist_mod, label="$" + str(omega_m) + "$")
+    plt.xlim(0, 2)
+    plt.ylim(32.5, 47.5)
+    plt.xlabel("$\\mathrm{Redshift}$")
+    plt.ylabel("$\\mathrm{Distance\\ Modulus}$")
+    plt.legend(title="$\\Omega_m$", frameon=False)
 
-plt.xlim(0, 2)
-plt.ylim(32.5, 47.5)
-plt.xlabel("$\\mathrm{Redshift}$")
-plt.ylabel("$\\mathrm{Distance\\ Modulus}$")
-plt.legend(title="$\\Omega_m$", frameon=False)
+    """ Exercise 2 """
 
-""" Exercise 2 """
+    fname = "jla_mub.txt"
+    table = pd.read_table(fname, delimiter=" ", skiprows=1,
+                          names=open(fname).readline()[1:].split())
 
-fname = "jla_mub.txt"
-table = pd.read_table(fname, delimiter=" ", skiprows=1,
-                      names=open(fname).readline()[1:].split())
+    plt.scatter(table["z"], table["mu"], color="purple", s=10, linewidth=0.5,
+                edgecolor="black", zorder=10)
 
-plt.scatter(table["z"], table["mu"], color="purple", s=10, linewidth=0.5,
-            edgecolor="black", zorder=10)
+    plt.savefig("1_observational_data.pdf", bbox_inches="tight")
+    plt.close()
 
-plt.savefig("1_observational_data.pdf", bbox_inches="tight")
-plt.close()
-
-""" Exercise 3 """
-
-
-def simulate_sne(n=20, z_range=(0, 2), omega_m=0.3, h=0.7):
-    z_vals = (z_range[1] - z_range[0])*np.random.rand(n) + z_range[0]
-    dist_mod_vals = calc_dist_mod(z_vals, omega_m, h)
-
-    return pd.DataFrame(np.c_[z_vals, dist_mod_vals], columns=("z", "mu"))
+    """ Exercise 3 """
 
 
-sim_table = simulate_sne()
+    def simulate_sne(n=20, z_range=(0, 2), omega_m=0.3, h=0.7):
+        z_vals = (z_range[1] - z_range[0])*np.random.rand(n) + z_range[0]
+        dist_mod_vals = calc_dist_mod(z_vals, omega_m, h)
 
-""" Exercise 4 """
+        return pd.DataFrame(np.c_[z_vals, dist_mod_vals], columns=("z", "mu"))
 
-sim_table.loc[:, "mu"] += 0.1*np.random.randn(sim_table.shape[0])
 
-""" Exercise 5 """
+    sim_table = simulate_sne()
 
-h_list = (0.6, 0.7, 0.8)
+    """ Exercise 4 """
 
-plt.figure()
-for h in h_list:
-    dist_mod = calc_dist_mod(z, 0.3, h)
-    plt.plot(z, dist_mod, label="$" + str(h) + "$")
+    sim_table.loc[:, "mu"] += 0.1*np.random.randn(sim_table.shape[0])
 
-plt.xlim(0, 2)
-plt.ylim(32.5, 47.5)
-plt.xlabel("$\\mathrm{Redshift}$")
-plt.ylabel("$\\mathrm{Distance\\ Modulus}$")
-plt.legend(title="$h$", frameon=False)
+    """ Exercise 5 """
 
-plt.errorbar(sim_table["z"], sim_table["mu"], yerr=0.1, lw=0.5, linestyle=" ",
-             capsize=2, capthick=0.5, color="black", zorder=9)
+    h_list = (0.6, 0.7, 0.8)
 
-plt.scatter(sim_table["z"], sim_table["mu"], color="purple", s=10,
-            linewidth=0.5, edgecolor="black", zorder=10)
+    plt.figure()
+    for h in h_list:
+        dist_mod = calc_dist_mod(z, 0.3, h)
+        plt.plot(z, dist_mod, label="$" + str(h) + "$")
 
-plt.savefig("2_simulated_data.pdf", bbox_inches="tight")
-plt.close()
+    plt.xlim(0, 2)
+    plt.ylim(32.5, 47.5)
+    plt.xlabel("$\\mathrm{Redshift}$")
+    plt.ylabel("$\\mathrm{Distance\\ Modulus}$")
+    plt.legend(title="$h$", frameon=False)
+
+    plt.errorbar(sim_table["z"], sim_table["mu"], yerr=0.1, lw=0.5, linestyle=" ",
+                 capsize=2, capthick=0.5, color="black", zorder=9)
+
+    plt.scatter(sim_table["z"], sim_table["mu"], color="purple", s=10,
+                linewidth=0.5, edgecolor="black", zorder=10)
+
+    plt.savefig("2_simulated_data.pdf", bbox_inches="tight")
+    plt.close()
