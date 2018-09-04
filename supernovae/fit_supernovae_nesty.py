@@ -51,7 +51,7 @@ def prior_trans(cube):
 
 fname = "jla_mub.txt"
 data = pd.read_table(fname, delimiter=" ", skiprows=1,
-                      names=open(fname).readline()[1:].split())
+                     names=open(fname).readline()[1:].split())
 
 cov = np.matrix(np.loadtxt("jla_mub_covmatrix").reshape(31, 31))
 cov_inv = np.linalg.inv(cov)
@@ -59,5 +59,7 @@ cov_inv = np.linalg.inv(cov)
 sampler = lnm.combined_sampler(lnlike, prior_trans, 2, n_live=2500)
 sampler.run()
 
-corner.corner(sampler.results["samples_eq"], labels=["$\\Omega_\\mathrm{M}$", "$h$"])
+corner.corner(sampler.results["samples_eq"],
+              labels=["$\\Omega_\\mathrm{M}$", "$h$"])
+
 plt.savefig("corner_nesty.pdf", bbox_inches="tight")
