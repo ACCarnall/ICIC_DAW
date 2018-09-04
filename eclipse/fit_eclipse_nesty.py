@@ -29,7 +29,7 @@ def prior_trans(cube):
     return cube*100 - 50
 
 
-sampler = nesty.ellipsoid_sampler(lnlike, prior_trans, 4, n_live=1000)
+sampler = nesty.ellipsoid_sampler(lnlike, prior_trans, 4, n_live=2500)
 sampler.run()
 
 samples = sampler.results["samples_eq"]

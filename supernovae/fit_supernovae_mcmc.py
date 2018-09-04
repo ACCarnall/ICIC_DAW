@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import corner
 import sys
-import lochnest_monster as nesty
+
+sys.path.append("../mcmc_sampler")
+from mcmc_sampler import mcmc_sampler
 
 sys.path.append("../preliminary")
 from exercises import *
@@ -24,10 +26,6 @@ def lnlike(param):
     return -0.5*chisq
 
 
-def prior_trans(cube):
-    return cube
-
-
 fname = "jla_mub.txt"
 data = pd.read_table(fname, delimiter=" ", skiprows=1,
                      names=open(fname).readline()[1:].split())
@@ -35,10 +33,15 @@ data = pd.read_table(fname, delimiter=" ", skiprows=1,
 cov = np.matrix(np.loadtxt("jla_mub_covmatrix").reshape(31, 31))
 cov_inv = np.linalg.inv(cov)
 
-sampler = nesty.ellipsoid_sampler(lnlike, prior_trans, 2, n_live=2500)
-sampler.run()
+sampler = mcmc_sampler(lnlike, 2)
 
-corner.corner(sampler.results["samples_eq"],
+n_samples = 50000
+prop_width = 0.01
+start_params = np.array([0.3, 0.7])
+
+sampler.run(n_samples, start_params, prop_width=prop_width)
+
+corner.corner(sampler.samples[int(n_samples/2):, :],
               labels=["$\\Omega_\\mathrm{M}$", "$h$"])
 
-plt.savefig("corner_nesty.pdf", bbox_inches="tight")
+plt.savefig("corner_mcmc.pdf", bbox_inches="tight")

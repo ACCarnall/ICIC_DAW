@@ -3,7 +3,9 @@ from __future__ import print_function, division, absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 import corner
+import sys
 
+sys.path.append("../mcmc_sampler")
 from mcmc_sampler import mcmc_sampler
 
 # Code to set up the problem and perform the sampling
@@ -28,12 +30,14 @@ def lnlike(param):
 
 sampler = mcmc_sampler(lnlike, 4)
 
-n_samples = 500000
-proposal_width = np.array([0.01, 0.01, 0.01, 0.5])
+n_samples = 200000
+prop_width = np.array([0.01, 0.01, 0.01, 0.5])
+start_params = np.array([0.16, -0.025, 0.375, 2.5])
 
-sampler.run(n_samples, [0.16, -0.025, 0.375, 2.5], prop_width=proposal_width)
+sampler.run(n_samples, start_params, prop_width=prop_width)
 
-corner.corner(sampler.samples, labels=["$a$", "$b$", "$c$", "$\\alpha$"],
+corner.corner(sampler.samples[int(n_samples/2):, :],
+              labels=["$a$", "$b$", "$c$", "$\\alpha$"],
               quantiles=(0.16, 0.5, 0.84), truths=[-999, -999, -999, 1.75])
 
 plt.savefig("corner_mcmc.pdf", bbox_inches="tight")
