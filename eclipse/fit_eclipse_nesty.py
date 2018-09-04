@@ -3,8 +3,7 @@ from __future__ import print_function, division, absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 import corner
-
-from mcmc_sampler import mcmc_sampler
+import lochnest_monster as nesty
 
 # Code to set up the problem and perform the sampling
 x = np.array([-1.261, -0.160, 0.334, 0.348, 0.587, 0.860, 1.079])
@@ -26,14 +25,16 @@ def lnlike(param):
     return -0.5*np.sum((model - dx)**2/sig**2)
 
 
-sampler = mcmc_sampler(lnlike, 4)
+def prior_trans(cube):
+    return cube*100 - 50
 
-n_samples = 500000
-proposal_width = np.array([0.01, 0.01, 0.01, 0.5])
 
-sampler.run(n_samples, [0.16, -0.025, 0.375, 2.5], prop_width=proposal_width)
+sampler = nesty.ellipsoid_sampler(lnlike, prior_trans, 4, n_live=1000)
+sampler.run()
 
-corner.corner(sampler.samples, labels=["$a$", "$b$", "$c$", "$\\alpha$"],
+samples = sampler.results["samples_eq"]
+
+corner.corner(samples, labels=["$a$", "$b$", "$c$", "$\\alpha$"],
               quantiles=(0.16, 0.5, 0.84), truths=[-999, -999, -999, 1.75])
 
-plt.savefig("corner_mcmc.pdf", bbox_inches="tight")
+plt.savefig("corner_nesty.pdf", bbox_inches="tight")

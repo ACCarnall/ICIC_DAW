@@ -38,7 +38,9 @@ def lnlike(param):
 
     model_dist_mod = calc_dist_mod(data["z"], omega_m, h)
 
-    chisq = np.sum(((data["mu"] - model_dist_mod)/data["mu_err"])**2)
+    mtaked = np.matrix(data["mu"] - model_dist_mod)
+
+    chisq = np.tensordot(np.tensordot(mtaked, cov_inv, axes=1), mtaked)
 
     return -0.5*chisq
 
@@ -51,13 +53,11 @@ fname = "jla_mub.txt"
 data = pd.read_table(fname, delimiter=" ", skiprows=1,
                       names=open(fname).readline()[1:].split())
 
-data["mu_err"] = 0.1
+cov = np.matrix(np.loadtxt("jla_mub_covmatrix").reshape(31, 31))
+cov_inv = np.linalg.inv(cov)
 
-
-ndim = 2
-
-sampler = lnm.combined_sampler(lnlike, prior_trans, ndim)
+sampler = lnm.combined_sampler(lnlike, prior_trans, 2, n_live=2500)
 sampler.run()
 
 corner.corner(sampler.results["samples_eq"], labels=["$\\Omega_\\mathrm{M}$", "$h$"])
-plt.savefig("corner.pdf", bbox_inches="tight")
+plt.savefig("corner_nesty.pdf", bbox_inches="tight")
