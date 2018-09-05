@@ -1,4 +1,5 @@
-from __future__ import division
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -30,7 +31,7 @@ def calc_dist_mod(z, omega_m, h):
     return 25 - 5*np.log10(h) + 5*np.log10(ldist)
 
 if __name__ is "__main__":
-    
+
     """ Exercise 1 """
 
     z = np.arange(0.01, 2, 0.01)

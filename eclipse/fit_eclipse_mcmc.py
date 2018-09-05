@@ -8,7 +8,6 @@ import sys
 sys.path.append("../mcmc_sampler")
 from mcmc_sampler import mcmc_sampler
 
-# Code to set up the problem and perform the sampling
 x = np.array([-1.261, -0.160, 0.334, 0.348, 0.587, 0.860, 1.079])
 y = np.array([-0.160, -1.107, 0.472, 0.360, 1.099, 1.321, -0.328])
 ex = np.array([-0.587, -0.557, -0.186, -0.222, 0.080, 0.158, 1.540])
